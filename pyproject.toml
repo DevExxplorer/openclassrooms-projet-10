@@ -1,0 +1,20 @@
+[project]
+name = "openclassrooms-projet-10"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "devexplorer",email = "contact@devexplorer.fr"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "djangorestframework (>=3.15.2,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
