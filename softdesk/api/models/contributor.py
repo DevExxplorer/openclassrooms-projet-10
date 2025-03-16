@@ -1,7 +1,7 @@
 from django.db import models
 
 from api.models import CustomUser
-from api.models.project_models import Project
+from softdesk.api.models.project import Project
 
 
 class Contributor(models.Model):

@@ -1,7 +1,7 @@
 from django.db import models
 
 from api.models import Contributor
-from api.models.issue_models import Issue
+from softdesk.api.models.issue import Issue
 
 
 class Comment(models.Model):

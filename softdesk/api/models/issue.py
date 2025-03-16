@@ -1,6 +1,6 @@
 from django.db import models
 
-from api.models import Project, Contributor, CustomUser
+from api.models import Project, CustomUser
 
 
 class Issue(models.Model):
@@ -11,8 +11,7 @@ class Issue(models.Model):
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    contributor = models.ForeignKey(Contributor, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
     tag = models.CharField(max_length=255, choices=TAG_CHOICES)
