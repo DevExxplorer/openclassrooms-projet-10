@@ -1,7 +1,7 @@
 from django.db import models
 
 from api.models import CustomUser
-from softdesk.api.models.project import Project
+from api.models.project import Project
 
 
 class Contributor(models.Model):
@@ -12,5 +12,3 @@ class Contributor(models.Model):
         # Pour éviter qu'un utilisateur soit plusieurs fois contributeur sur le même projet
         unique_together = ('user', 'project')
 
-    def __str__(self):
-        return f"{self.user.username} - {self.project.name} ({self.get_role_display()})"

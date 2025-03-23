@@ -1,20 +1,32 @@
 from django.db import models
 
-from api.models import Project, CustomUser
+from api.models import CustomUser
 
 
 class Issue(models.Model):
-    TAG_CHOICES = [
+    TYPE_CHOICES = [
         ('bug', 'Bug'),
         ('task', 'Tâche'),
         ('amelioration', 'Amélioration')
     ]
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    PRIORITY_CHOICES = [
+        ('low', 'Faible'),
+        ('medium', 'Moyen'),
+        ('hight', 'Elevé')
+    ]
+
+    STATUS_CHOICES = [
+        ('todo', 'A faire'),
+        ('inprogress', 'En cours'),
+        ('finished', 'Terminé')
+    ]
+
     title = models.CharField(max_length=255)
     description = models.TextField()
-    tag = models.CharField(max_length=255, choices=TAG_CHOICES)
-    priority = models.CharField(max_length=255)
-    status = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='todo')
+    priority = models.CharField(max_length=255, choices=PRIORITY_CHOICES)
+    author = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
+    type_issue = models.CharField(max_length=255, choices=TYPE_CHOICES)
+    # project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="project")
     created_at = models.DateTimeField(auto_now_add=True)
