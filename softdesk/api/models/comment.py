@@ -1,7 +1,7 @@
-from django.db import models
+"""from django.db import models
 
-from api.models import Contributor
-from softdesk.api.models.issue import Issue
+from api.models.contributor import Contributor
+from api.models.issue import Issue
 
 
 class Comment(models.Model):
@@ -9,3 +9,4 @@ class Comment(models.Model):
     contributor = models.ForeignKey(Contributor, on_delete=models.CASCADE)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+"""

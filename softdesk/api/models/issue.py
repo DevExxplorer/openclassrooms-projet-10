@@ -1,6 +1,6 @@
 from django.db import models
 
-from api.models import CustomUser
+from api.models.user import CustomUser
 
 
 class Issue(models.Model):
