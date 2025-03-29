@@ -16,6 +16,7 @@ projects_router.register('contributors', ContributorViewSet, basename='project-c
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/', include(projects_router.urls)),
 ]
 
 

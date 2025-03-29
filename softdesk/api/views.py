@@ -29,9 +29,15 @@ class IssueViewSet(ModelViewSet):
     def get_queryset(self):
         return Issue.objects.all()
 
+
 class ContributorViewSet(ModelViewSet):
     serializer_class = ContributorSerializer
 
     def get_queryset(self):
         project_id = self.kwargs.get('project_pk')
         return Contributor.objects.filter(project_id=project_id)
+
+    def perform_create(self, serializer):
+        project_id = self.kwargs.get('project_pk')
+        project = Project.objects.get(id=project_id)
+        serializer.save(project=project)
