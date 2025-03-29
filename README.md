@@ -43,8 +43,8 @@ Les requêtes sont protégées par une authentification JWT token
 ```json
 {
   "id": 1,
-  "tilte": "TITLE",
-  "description": "DESCRIPTION",
+  "tilte": "",
+  "description": "",
   "type_project": "back",
   "created_at": "2025-03-29T13:38:33.812592Z",
   "link": {
@@ -56,32 +56,27 @@ Les requêtes sont protégées par une authentification JWT token
 
 ### Contributors
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/projects/{projectId}/contributors` | List all contributors of a project |
+| Method | Endpoint                                  | Description |
+|--------|-------------------------------------------|-------------|
+| GET | `/projects/{projectId}/contributors/`     | List all contributors of a project |
 | GET | `/projects/{projectId}/contributors/{id}` | Get a specific contributor |
-| POST | `/projects/{projectId}/contributors` | Add a user as contributor to a project |
-| PUT | `/projects/{projectId}/contributors/{id}` | Update a contributor's role |
+| POST | `/projects/{projectId}/contributors`      | Add a user as contributor to a project |
 | DELETE | `/projects/{projectId}/contributors/{id}` | Remove a contributor from a project |
 
 #### Exemple
 ```json
-{
-  "id": 1,
-  "userId": 5,
-  "projectId": 1,
-  "username": "mariemartin",
-  "role": "developer",
-  "joinedAt": "2025-02-15T10:00:00Z"
-}
-```
-
-#### Exemple
-```json
-// POST /api/projects/1/contributors
-{
-  "userId": 5,
-  "role": "developer"
+ {
+        "id": 3,
+        "user": {
+            "id": 3,
+            "username": "Clément",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "birth_date": "2024-01-29",
+            "can_be_contacted": false,
+            "can_data_be_shared": false
+        }
 }
 ```
 
