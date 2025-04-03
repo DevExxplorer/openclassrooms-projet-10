@@ -1,5 +1,6 @@
 from django.db import models
 
+from api.models import Project
 from api.models.user import CustomUser
 
 
@@ -28,5 +29,5 @@ class Issue(models.Model):
     priority = models.CharField(max_length=255, choices=PRIORITY_CHOICES)
     author = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
     type_issue = models.CharField(max_length=255, choices=TYPE_CHOICES)
-    # project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="project")
     created_at = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="issues")

@@ -23,10 +23,14 @@ Les requêtes sont protégées par une authentification JWT token
 #### Exemple
 ```json
 {
-  "id": 1,
-  "username": "johndoe",
-  "email": "john@example.com",
-  "createdAt": "2025-01-15T14:30:00Z"
+    "id": 2,
+    "username": "Manon",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "birth_date": "1991-11-12",
+    "can_be_contacted": false,
+    "can_data_be_shared": false
 }
 ```
 
@@ -82,29 +86,27 @@ Les requêtes sont protégées par une authentification JWT token
 
 ### Issues
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/projects/{projectId}/issues` | List all issues of a project |
-| GET | `/projects/{projectId}/issues/{id}` | Get a specific issue |
-| POST | `/projects/{projectId}/issues` | Create a new issue |
-| PUT | `/projects/{projectId}/issues/{id}` | Update an issue |
-| DELETE | `/projects/{projectId}/issues/{id}` | Delete an issue |
+| Method | Endpoint                             | Description |
+|--------|--------------------------------------|-------------|
+| GET | `/projects/{projectId}/issues/`      | List all issues of a project |
+| GET | `/projects/{projectId}/issues/{id}/` | Get a specific issue |
+| POST | `/projects/{projectId}/issues/`      | Create a new issue |
+| PUT | `/projects/{projectId}/issues/{id}/` | Update an issue |
+| DELETE | `/projects/{projectId}/issues/{id}/` | Delete an issue |
 
 #### Exemple
 ```json
 {
-  "id": 1,
-  "projectId": 1,
-  "title": "Login page not responsive",
-  "description": "The login page doesn't render correctly on mobile devices",
-  "status": "open",
-  "createdBy": 5,
-  "assignedTo": 3,
-  "createdAt": "2025-03-01T11:30:00Z",
-  "links": {
-    "comments": "/api/projects/1/issues/1/comments"
-  }
-}
+        "id": 3,
+        "title": "title",
+        "description": "description",
+        "status": "todo",
+        "priority": "low",
+        "author": 1,
+        "type_issue": "bug",
+        "created_at": "2025-03-30T15:32:25.655233Z",
+        "link": "http://127.0.0.1:8000/api/projects/1/issues/3/comments/"‡
+},
 ```
 
 ### Comments

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework_nested import routers
 
-from api.views import UserViewSet, ProjectViewSet, IssueViewSet, ContributorViewSet
+from api.views import UserViewSet, ProjectViewSet, IssueViewSet, ContributorViewSet, CommentViewSet
 
 router = routers.SimpleRouter()
 
@@ -13,10 +13,15 @@ projects_router = routers.NestedSimpleRouter(router, r'projects', lookup='projec
 projects_router.register(r'issues', IssueViewSet, basename='project-issues')
 projects_router.register('contributors', ContributorViewSet, basename='project-contributors')
 
+issues_router = routers.NestedSimpleRouter(projects_router, r'issues', lookup='issue')
+issues_router.register(r'comments', CommentViewSet, basename='issue-comments')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/', include(projects_router.urls)),
+
+path('api/', include(issues_router.urls)),
 ]
 
 

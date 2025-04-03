@@ -15,10 +15,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         date_now = date.today()
         date_birthday = value
 
-        if date_now.year - date_birthday.year >= 15:
-            print(date_now.year)
-            print(date_birthday.year)
-        else:
-            raise serializers.ValidationError('Trop jeune')
+        if date_now.year - date_birthday.year <= 15:
+            raise serializers.ValidationError('Oups ! Tu dois avoir au moins 15 ans pour accéder à cette fonctionnalité. Reviens quand tu auras l\'âge requis !')
 
         return value

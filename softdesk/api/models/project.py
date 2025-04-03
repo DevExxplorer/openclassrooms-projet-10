@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Project(models.Model):
     TYPE_CHOICES = [
         ('back', 'Back-end'),
@@ -13,3 +12,4 @@ class Project(models.Model):
     description = models.TextField()
     type_project = models.CharField(max_length=10, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    # author = ''
