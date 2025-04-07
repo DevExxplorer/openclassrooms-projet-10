@@ -11,6 +11,7 @@ class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = ['id', 'title', 'description', 'status', 'priority', 'author', 'type_issue',  'created_at', 'contributors', 'link']
+        read_only_fields = ['author']
 
     @staticmethod
     def get_link(obj):

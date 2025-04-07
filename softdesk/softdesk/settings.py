@@ -40,12 +40,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_nested',
     'api',
+    'error_handling'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'EXCEPTION_HANDLER': 'error_handling.exception_handler.custom_exception_handler',
 }
 
 MIDDLEWARE = [
@@ -75,6 +77,10 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 WSGI_APPLICATION = 'softdesk.wsgi.application'
 
@@ -133,3 +139,12 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.CustomUser'
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token d'accès valable 1 heure
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Token de rafraîchissement valable 7 jours
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

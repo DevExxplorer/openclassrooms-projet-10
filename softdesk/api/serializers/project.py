@@ -11,7 +11,8 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields =  [ 'id', 'title', 'description', 'type_project', 'created_at',  'contributors', 'link']
+        fields =  [ 'id', 'title', 'description', 'type_project', 'created_at', 'author',  'contributors', 'link']
+        read_only_fields = ['author']
 
     def get_link(self, obj):
         links = {
