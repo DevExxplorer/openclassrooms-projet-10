@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import CustomUser, Project, Issue, Contributor, Comment
+from api.permissions import IsContributorAuthenticated
 from api.serializers.user import UserSerializer
 from api.serializers.project import ProjectSerializer
 from api.serializers.issue import IssueSerializer
@@ -33,9 +34,15 @@ class ProjectViewSet(ModelViewSet):
         project.author = contributor
         project.save()
 
+    def get_permissions(self):
+        if self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsContributorAuthenticated()]
+        return [IsAuthenticated()]
+
 
 class IssueViewSet(ModelViewSet):
     serializer_class = IssueSerializer
+    permission_classes = [IsContributorAuthenticated]
     
     def get_queryset(self):
         project_id = self.kwargs.get('project_pk')
@@ -57,6 +64,9 @@ class IssueViewSet(ModelViewSet):
 
         # On sauvegarde l'issue en associant le projet
         issue = serializer.save(project=project, author=contributor)
+
+    def get_permissions(self):
+        return [IsAuthenticated(), IsContributorAuthenticated()]
 
 
 class ContributorViewSet(ModelViewSet):
@@ -98,4 +108,7 @@ class CommentViewSet(ModelViewSet):
 
         # On sauvegarde l'issue en associant le projet
         issue = serializer.save(issue=issue, author=contributor)
+
+    def get_permissions(self):
+        return [IsAuthenticated(), IsContributorAuthenticated()]
 
