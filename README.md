@@ -1,5 +1,11 @@
 # SOFTDESK - Documentation
 
+## Flake8
+
+```
+    flake8 --max-line-length=120 --exclude=.venv . > flake8_errors.log
+```
+
 ## URL
 ```
 http://127.0.0.1:8000/api

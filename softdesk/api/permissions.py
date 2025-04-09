@@ -1,5 +1,4 @@
 from rest_framework.permissions import BasePermission
-
 from api.models import Contributor
 
 
@@ -13,6 +12,7 @@ class IsAuthorAuthenticated(BasePermission):
         if not (request.user and request.user.is_authenticated):
             return False
 
+
 class IsContributorAuthenticated(BasePermission):
     """
     Autorise uniquement les contributeurs du projet.
@@ -20,7 +20,6 @@ class IsContributorAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-        print('user', user)
 
         if not user or not user.is_authenticated:
             return False
@@ -30,4 +29,3 @@ class IsContributorAuthenticated(BasePermission):
             return False
 
         return Contributor.objects.filter(project_id=project_id, user=user).exists()
-

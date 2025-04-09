@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from datetime import date
-
 from api.models.user import CustomUser
 
 
@@ -17,12 +16,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = [ 'id', 'username', 'first_name', 'last_name', 'password', 'email', 'birth_date', 'can_be_contacted', 'can_data_be_shared']
+        fields = ['id', 'username', 'first_name', 'last_name', 'password', 'email', 'birth_date', 'can_be_contacted', 'can_data_be_shared']
 
     @staticmethod
     def validate_birth_date(value):
         """
-        Validation personnalisée pour s'assurer que l'utilisateur a au moins 15 ans.
+        Validation personnalisée pour s'assurer que l'utilisateur est au moins 15 ans.
         """
         date_now = date.today()
         date_birthday = value

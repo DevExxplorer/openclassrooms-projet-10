@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from api.models import Contributor, Project,  CustomUser
+from api.models import Contributor
 from api.serializers.user import UserSerializer
 
 

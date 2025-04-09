@@ -1,7 +1,5 @@
 from django.db import models
-
 from api.models import Project, Contributor
-from api.models.user import CustomUser
 
 
 class Issue(models.Model):
