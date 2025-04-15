@@ -1,9 +1,11 @@
+from django.db import IntegrityError
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import CustomUser, Project, Issue, Contributor, Comment
-from api.permissions import IsContributorAuthenticated
+from api.permissions import IsAuthor, IsContributorAuthenticated
 from api.serializers.user import UserSerializer
 from api.serializers.project import ProjectSerializer
 from api.serializers.issue import IssueSerializer
@@ -33,13 +35,27 @@ class ProjectViewSet(ModelViewSet):
        L'utilisateur doit être authentifié et, dans certains cas, être contributeur du projet.
    """
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthor()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         """
            Retourne la liste de tous les projets.
         """
-        return Project.objects.all()
+        user = self.request.user
+        return Project.objects.filter(contributors_project__user=user)
+
+    def get_object(self):
+        """
+        Récupère un projet spécifique et vérifie que l'utilisateur est contributeur.
+        """
+        queryset = self.get_queryset()
+        obj = get_object_or_404(queryset, pk=self.kwargs["pk"])
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def perform_create(self, serializer):
         """
@@ -51,15 +67,6 @@ class ProjectViewSet(ModelViewSet):
         contributor = Contributor.objects.create(user=user, project=project)
         project.author = contributor
         project.save()
-
-    def get_permissions(self):
-        """
-            Définit les permissions en fonction de l'action. Si l'action est 'retrieve', 'update', 'partial_update' ou 'destroy',
-            l'utilisateur doit également être un contributeur du projet.
-        """
-        if self.action in ['retrieve', 'update', 'partial_update', 'destroy']:
-            return [IsAuthenticated(), IsContributorAuthenticated()]
-        return [IsAuthenticated()]
 
 
 class IssueViewSet(ModelViewSet):
@@ -101,29 +108,6 @@ class IssueViewSet(ModelViewSet):
         return [IsAuthenticated(), IsContributorAuthenticated()]
 
 
-class ContributorViewSet(ModelViewSet):
-    """
-    ViewSet pour gérer les contributeurs d'un projet.
-    Permet d'ajouter des contributeurs à un projet.
-    """
-    serializer_class = ContributorSerializer
-
-    def get_queryset(self):
-        """
-        Retourne la liste des contributeurs associés à un projet spécifique.
-        """
-        project_id = self.kwargs.get('project_pk')
-        return Contributor.objects.filter(project_id=project_id)
-
-    def perform_create(self, serializer):
-        """
-       Associe un contributeur à un projet spécifique.
-       """
-        project_id = self.kwargs.get('project_pk')
-        project = Project.objects.get(id=project_id)
-        serializer.save(project=project)
-
-
 class CommentViewSet(ModelViewSet):
     """
     ViewSet pour gérer les commentaires sur les issues.
@@ -163,3 +147,42 @@ class CommentViewSet(ModelViewSet):
        Définit les permissions pour cette vue. Seuls les contributeurs authentifiés peuvent commenter.
        """
         return [IsAuthenticated(), IsContributorAuthenticated()]
+
+
+class ContributorViewSet(ModelViewSet):
+    serializer_class = ContributorSerializer
+    permission_classes = [IsAuthor]
+
+    def get_permissions(self):
+        if self.request.method in ['GET', 'POST', 'DELETE']:
+            return [IsAuthor()]
+        return [IsContributorAuthenticated()]
+
+    def get_project_id(self):
+        """
+        Retourne l'id du projet
+        """
+        return self.kwargs.get('project_pk')
+
+    def get_queryset(self):
+        """
+        Retourne les contributeurs associés au projet.
+        """
+        return Contributor.objects.filter(project_id=self.get_project_id())
+
+    def perform_create(self, serializer):
+        """
+        Crée un nouveau contributeur pour le projet.
+        """
+        try:
+            serializer.save(project_id=self.get_project_id())
+        except IntegrityError:
+            raise ValidationError({"detail": "Ce contributeur est déjà ajouté à ce projet."})
+
+
+    def perform_destroy(self, instance):
+        """
+        Supprime un contributeur
+        """
+        print(f"Suppression de : {instance}")
+        instance.delete()
