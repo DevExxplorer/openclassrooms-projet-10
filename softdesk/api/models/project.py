@@ -1,6 +1,6 @@
 from django.db import models
 
-from api.models import Contributor
+from api.models import Contributor, CustomUser
 
 
 class Project(models.Model):
@@ -15,4 +15,4 @@ class Project(models.Model):
     description = models.TextField()
     type_project = models.CharField(max_length=10, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(Contributor, on_delete=models.CASCADE, related_name='authored_project', null=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='authored_project', null=True)
