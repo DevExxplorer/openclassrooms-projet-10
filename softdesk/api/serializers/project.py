@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Project, CustomUser
+from api.models import Project
 from api.serializers.contributor import ContributorSerializer
 
 
@@ -7,10 +7,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     """
    Sérialiseur pour le modèle Project.
    """
-    URL = 'http://127.0.0.1:8000/api/projects/'
+    baseUrl = 'http://127.0.0.1:8000/'
+    url = f'{baseUrl}api/projects/'
     link = serializers.SerializerMethodField()
     contributors = ContributorSerializer(source="contributors_project", many=True, read_only=True)
-    author = CustomUser()
 
     class Meta:
         model = Project
@@ -19,7 +19,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     def get_link(self, obj):
         links = {
-            'contributors': f'{self.URL}{obj.id}/contributors',
-            'issues': f'{self.URL}{obj.id}/issues',
+            'contributors': f'{self.url}{obj.id}/contributors',
+            'issues': f'{self.url}{obj.id}/issues',
         }
         return links
