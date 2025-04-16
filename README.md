@@ -16,25 +16,29 @@ Les requêtes sont protégées par une authentification JWT token
 
 ## API Endpoints
 
-### Users
+### 👤 Users
 
-|      Method       |   Endpoint    |     Description     |
-|:-----------------:|:-------------:|:-------------------:|
-|        GET        |   `/users`    |   List all users    |
-|        GET        | `/users/{id}` | Get a specific user |
-|       POST        |   `/users`    |  Create a new user  |
-|        PUT        | `/users/{id}` |    Update a user    |
-|      DELETE       | `/users/{id}` |    Delete a user    |
+<br>
+
+| Method    | Endpoint           | Description         |
+|:----------|:-------------------|:---------------------|
+| GET       | `/users`           | List all users      |
+| GET       | `/users/{id}`      | Get a specific user |
+| POST      | `/users`           | Create a new user   |
+| PUT/PATCH | `/users/{id}/`     | Update a user       |
+| DELETE    | `/users/{id}/`     | Delete a user       |
 
 ### 📁 Projects
 
-| Method    | Endpoint           | Description            | Accès                  |
-|-----------|--------------------|------------------------|-------------------------|
-| GET       | `/projects`        | List all projects      | `IsProjectContributor` |
-| GET       | `/projects/{id}`   | Get a specific project | `IsProjectContributor` |
-| POST      | `/projects`        | Create a new project   | `IsAuthenticated`      |
-| PUT/PATCH | `/projects/{id}/`  | Update a project       | `IsAuthor`             |
-| DELETE    | `/projects/{id}/`  | Delete a project       | `IsAuthor`             |
+<br>
+
+| Method    | Endpoint           | Description            |
+|:----------|:-------------------|:------------------------|
+| GET       | `/projects`        | List all projects      |
+| GET       | `/projects/{id}`   | Get a specific project |
+| POST      | `/projects`        | Create a new project   |
+| PUT/PATCH | `/projects/{id}/`  | Update a project       |
+| DELETE    | `/projects/{id}/`  | Delete a project       |
 
 
 ### 👥 Contributors
