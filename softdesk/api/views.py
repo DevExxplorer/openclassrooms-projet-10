@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.db.models import Q
+from rest_framework.generics import get_object_or_404
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError, PermissionDenied
@@ -19,7 +20,6 @@ class UserViewSet(ModelViewSet):
 
         if self.action != 'retrieve' and user.is_superuser:
             return CustomUser.objects.all()
-
         return CustomUser.objects.filter(id=user.id)
 
     def perform_create(self, serializer):
@@ -33,7 +33,7 @@ class UserViewSet(ModelViewSet):
 
 class ProjectViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, IsAuthor]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -42,58 +42,84 @@ class ProjectViewSet(ModelViewSet):
         ).distinct()
 
     def perform_create(self, serializer):
+        """
+        Creation d'un nouveau projet
+        """
         user = self.request.user
         project = serializer.save(author=user)
 
+        project.contributors_project.create(
+            user = user,
+            project=project,
+        )
 
-###
+    def get_permissions(self):
+        """
+        Applique IsAuthenticated à toutes les actions,
+        et ajoute IsAuthor uniquement au méthode update et delete
+        """
+        permissions = [IsAuthenticated()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permissions.append(IsAuthor())
+        return permissions
+
+
 class ContributorViewSet(ModelViewSet):
     serializer_class = ContributorSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'delete']
 
     def get_project_id(self):
         return self.kwargs.get('project_pk')
 
     def get_queryset(self):
-        is_contributor = Contributor.objects.filter(project_id=self.get_project_id(), user=self.request.user).exists()
-
-        if not is_contributor:
-            raise PermissionDenied("Vous n'êtes pas contributeur de ce projet.")
-
-        return Contributor.objects.filter(project_id=self.get_project_id())
+        return Contributor.objects.filter(
+            project_id=self.get_project_id(),
+        )
 
     def perform_create(self, serializer):
         try:
-            serializer.save(project_id=self.get_project_id())
+            project = get_object_or_404(Project, pk=self.get_project_id())
+            serializer.save(project=project)
         except IntegrityError:
             raise ValidationError({"detail": "Ce contributeur est déjà ajouté à ce projet."})
 
     def perform_destroy(self, instance):
+        project = instance.project
+        if instance.user == project.author:
+            raise ValidationError({"detail": "Impossible de supprimer l'auteur du projet."})
+
         instance.delete()
 
-##
+
 class IssueViewSet(ModelViewSet):
     serializer_class = IssueSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        project_id = self.kwargs.get('project_pk')
-        return Issue.objects.filter(project_id=project_id)
+        project_pk = self.kwargs.get('project_pk')
+        return Issue.objects.filter(project_id=project_pk)
 
     def perform_create(self, serializer):
         user = self.request.user
+        project_pk = self.kwargs.get('project_pk')
+        project = Project.objects.get(id=project_pk)
+        serializer.save(project=project, author=user)
 
-        project_id = self.kwargs.get('project_pk')
-        project = Project.objects.get(id=project_id)
+    def get_permissions(self):
+        """
+        Applique IsAuthenticated à toutes les actions,
+        et ajoute IsAuthor uniquement au méthode update et delete
+        """
+        permissions = [IsAuthenticated()]
+        if self.action in ['destroy']:
+            permissions.append(IsAuthor())
+        return permissions
 
-        contributor = Contributor.objects.filter(project=project, user=user).first()
 
-        if not contributor:
-            raise ValidationError("You are not a contributor to this project.")
-
-        serializer.save(project=project, author=contributor)
-
-##@
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         issue_id = self.kwargs["issue_pk"]
@@ -108,9 +134,14 @@ class CommentViewSet(ModelViewSet):
         issue_id = self.kwargs.get('issue_pk')
         issue = Issue.objects.get(id=issue_id)
 
-        contributor = Contributor.objects.filter(project=project, user=user).first()
+        issue = serializer.save(issue=issue, author=user)
 
-        if not contributor:
-            raise ValidationError("You are not a contributor to this project.")
-
-        issue = serializer.save(issue=issue, author=contributor)
+    def get_permissions(self):
+        """
+        Applique IsAuthenticated à toutes les actions,
+        et ajoute IsAuthor uniquement au méthode update et delete
+        """
+        permissions = [IsAuthenticated()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permissions.append(IsAuthor())
+        return permissions

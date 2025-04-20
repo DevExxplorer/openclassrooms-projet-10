@@ -1,5 +1,5 @@
 from django.db import models
-from api.models import Project, Contributor
+from api.models import Project, CustomUser
 
 
 class Issue(models.Model):
@@ -25,7 +25,7 @@ class Issue(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='todo')
     priority = models.CharField(max_length=255, choices=PRIORITY_CHOICES)
-    author = models.ForeignKey(Contributor, on_delete=models.CASCADE, related_name='authored_issue', null=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='authored_issue', null=True)
     type_issue = models.CharField(max_length=255, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="issues")
