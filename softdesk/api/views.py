@@ -12,10 +12,17 @@ from api.serializers import UserSerializer, ProjectSerializer, IssueSerializer, 
 
 
 class UserViewSet(ModelViewSet):
+    """
+       API endpoint permettant de gérer les utilisateurs.
+    """
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+        Retourne l'ensemble des utilisateurs si l'utilisateur connecté est admin,
+        sinon retourne uniquement ses propres informations.
+        """
         user = self.request.user
 
         if self.action != 'retrieve' and user.is_superuser:
@@ -23,6 +30,9 @@ class UserViewSet(ModelViewSet):
         return CustomUser.objects.filter(id=user.id)
 
     def perform_create(self, serializer):
+        """
+             Crée un nouvel utilisateur uniquement si l'utilisateur connecté est un admin.
+         """
         user = self.request.user
 
         if not user.is_superuser:
@@ -32,10 +42,18 @@ class UserViewSet(ModelViewSet):
 
 
 class ProjectViewSet(ModelViewSet):
+    """
+    API endpoint permettant de gérer les projets.
+    """
+
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+          Retourne la liste des projets pour lesquels l'utilisateur connecté est
+          soit auteur, soit contributeur.
+       """
         user = self.request.user
         return Project.objects.filter(
             Q(contributors_project__user=user) | Q(author=user)
@@ -43,8 +61,9 @@ class ProjectViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Creation d'un nouveau projet
-        """
+           Crée un nouveau projet avec l'utilisateur connecté comme auteur,
+           et l'ajoute automatiquement comme contributeur au projet.
+       """
         user = self.request.user
         project = serializer.save(author=user)
 
@@ -55,8 +74,9 @@ class ProjectViewSet(ModelViewSet):
 
     def get_permissions(self):
         """
-        Applique IsAuthenticated à toutes les actions,
-        et ajoute IsAuthor uniquement au méthode update et delete
+        Détermine dynamiquement les permissions :
+        IsAuthenticated pour toutes les actions
+        IsAuthor ajouté pour les actions de modification et suppression
         """
         permissions = [IsAuthenticated()]
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -65,19 +85,32 @@ class ProjectViewSet(ModelViewSet):
 
 
 class ContributorViewSet(ModelViewSet):
+    """
+    API endpoint pour gérer les contributeurs d'un projet.
+    """
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'delete']
 
     def get_project_id(self):
+        """
+        Récupère l'identifiant du projet depuis l'URL.
+        """
         return self.kwargs.get('project_pk')
 
     def get_queryset(self):
+        """
+        Liste les contributeurs associés au projet spécifié.
+        """
         return Contributor.objects.filter(
             project_id=self.get_project_id(),
         )
 
     def perform_create(self, serializer):
+        """
+        Ajoute un contributeur à un projet.
+        Lève une erreur si le contributeur est déjà ajouté.
+        """
         try:
             project = get_object_or_404(Project, pk=self.get_project_id())
             serializer.save(project=project)
@@ -85,6 +118,9 @@ class ContributorViewSet(ModelViewSet):
             raise ValidationError({"detail": "Ce contributeur est déjà ajouté à ce projet."})
 
     def perform_destroy(self, instance):
+        """
+        Supprime un contributeur, sauf s’il est l’auteur du projet.
+        """
         project = instance.project
         if instance.user == project.author:
             raise ValidationError({"detail": "Impossible de supprimer l'auteur du projet."})
@@ -93,14 +129,24 @@ class ContributorViewSet(ModelViewSet):
 
 
 class IssueViewSet(ModelViewSet):
+    """
+    API endpoint pour gérer les issues d’un projet.
+    """
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+        Liste les issues associées à un projet spécifique.
+        """
         project_pk = self.kwargs.get('project_pk')
         return Issue.objects.filter(project_id=project_pk)
 
     def perform_create(self, serializer):
+        """
+        Crée une nouvelle issue pour le projet spécifié,
+        avec l’utilisateur connecté comme auteur.
+        """
         user = self.request.user
         project_pk = self.kwargs.get('project_pk')
         project = Project.objects.get(id=project_pk)
@@ -109,7 +155,7 @@ class IssueViewSet(ModelViewSet):
     def get_permissions(self):
         """
         Applique IsAuthenticated à toutes les actions,
-        et ajoute IsAuthor uniquement au méthode update et delete
+        et ajoute IsAuthor uniquement à la suppression.
         """
         permissions = [IsAuthenticated()]
         if self.action in ['destroy']:
@@ -118,14 +164,24 @@ class IssueViewSet(ModelViewSet):
 
 
 class CommentViewSet(ModelViewSet):
+    """
+        API endpoint pour gérer les commentaires liés à une issue.
+    """
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+        Liste les commentaires associés à une issue spécifique.
+        """
         issue_id = self.kwargs["issue_pk"]
         return Comment.objects.filter(issue_id=issue_id)
 
     def perform_create(self, serializer):
+        """
+       Crée un commentaire lié à une issue,
+       avec l’utilisateur connecté comme auteur.
+       """
         user = self.request.user
 
         issue_id = self.kwargs.get('issue_pk')
@@ -136,7 +192,7 @@ class CommentViewSet(ModelViewSet):
     def get_permissions(self):
         """
         Applique IsAuthenticated à toutes les actions,
-        et ajoute IsAuthor uniquement au méthode update et delete
+        et ajoute IsAuthor pour les actions de modification et suppression.
         """
         permissions = [IsAuthenticated()]
         if self.action in ['update', 'partial_update', 'destroy']:
