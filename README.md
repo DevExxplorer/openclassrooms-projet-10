@@ -1,9 +1,27 @@
 # SOFTDESK - Documentation
 
-## Flake8
+## 🚀 Installation
 
-```
-    flake8 --max-line-length=120 --exclude=.venv . > flake8_errors.log
+Ce projet utilise Poetry. Pour l’installer, suivez la documentation officielle (https://python-poetry.org/docs/)
+
+```bash
+git clone https://github.com/DevExxplorer/openclassrooms-projet-10
+cd openclassrooms-projet-10
+
+# Installer les dépendances avec Poetry
+poetry install
+
+# Se rendre dans le dossier du projet Django
+cd softdesk
+
+# Appliquer les migrations
+poetry run python manage.py migrate
+
+# Créer un super utilisateur
+poetry run python manage.py createsuperuser
+
+# Lancer le serveur de développement
+poetry run python manage.py runserver
 ```
 
 ## URL
@@ -13,6 +31,10 @@ http://127.0.0.1:8000/api
 
 ## Authentication
 Les requêtes sont protégées par une authentification JWT token
+
+| Method   | Endpoint  | Description                                                                       |
+|:---------|:----------|:----------------------------------------------------------------------------------|
+| **POST** | `/token/` | Permet de récupérer un token JWT. Nécessite d’envoyer un username et un password. |
 
 ## API Endpoints
 
@@ -77,5 +99,13 @@ Les requêtes sont protégées par une authentification JWT token
 
 | Parameter | Description | Example |
 |-----------|-------------|---------|
-` | `page[number]` | Page number for pagination | `?page[number]=2` |
+ | `page[number]` | Page number for pagination | `?page[number]=2` |
 | `page[size]` | Results per page | `?page[size]=20` |
+
+
+
+## Flake8
+
+```
+    flake8 --max-line-length=120 --exclude=.venv . > flake8_errors.log
+```
