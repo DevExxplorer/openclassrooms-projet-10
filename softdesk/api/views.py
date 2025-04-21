@@ -49,7 +49,7 @@ class ProjectViewSet(ModelViewSet):
         project = serializer.save(author=user)
 
         project.contributors_project.create(
-            user = user,
+            user=user,
             project=project,
         )
 
@@ -127,9 +127,6 @@ class CommentViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         user = self.request.user
-
-        project_id = self.kwargs.get('project_pk')
-        project = Project.objects.get(id=project_id)
 
         issue_id = self.kwargs.get('issue_pk')
         issue = Issue.objects.get(id=issue_id)
