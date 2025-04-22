@@ -139,7 +139,17 @@ class IssueViewSet(ModelViewSet):
         """
         Liste les issues associées à un projet spécifique.
         """
+        user = self.request.user
         project_pk = self.kwargs.get('project_pk')
+
+        is_contributor = Contributor.objects.filter(
+            project_id=project_pk,
+            user=user
+        ).exists()
+
+        if not is_contributor:
+            return Issue.objects.none()
+
         return Issue.objects.filter(project_id=project_pk)
 
     def perform_create(self, serializer):
@@ -174,7 +184,18 @@ class CommentViewSet(ModelViewSet):
         """
         Liste les commentaires associés à une issue spécifique.
         """
+        user = self.request.user
         issue_id = self.kwargs["issue_pk"]
+        issue = Issue.objects.get(id=issue_id)
+
+        is_contributor = Contributor.objects.filter(
+            project_id=issue.project.id,
+            user=user
+        ).exists()
+
+        if not is_contributor:
+            return Comment.objects.none()
+
         return Comment.objects.filter(issue_id=issue_id)
 
     def perform_create(self, serializer):
